@@ -6,7 +6,7 @@ The module contains two main interfaces to the Lumenera pvcam API:
 *API*, a low level ctypes interface to the Pvcam32.dll,
     exposing all definitions/declarations found in the lucam.h C header.
 
-*Lucam*, a high level object interface wrapping most of the ctypes interface,
+*Princeton*, a high level object interface wrapping most of the ctypes interface,
     featuring exception based error handling and numpy.array type images.
 
 :Author:
@@ -21,7 +21,7 @@ Requirements
 ------------
 * `CPython 2.7 or 3.3 <http://www.python.org>`_
 * `Numpy 1.7 <http://www.numpy.org>`_
-* `Princeton camera and drivers 5.0 <http://www.lumenera.com/>`_
+* `Princeton camera and drivers Pvcam32.dll`_
 
 Notes
 -----
@@ -38,8 +38,11 @@ Documentation in HTML format can be generated with Epydoc.
 Examples
 --------
 >>> from Princeton_wrapper import Princeton
+>>> import matplotlib.pyplot as plt
 >>> camera = Princeton()
 >>> image = camera.TakePicture()
+>>> plt.imshow(image)
+>>> camera.close()
 
 
 """
@@ -52,9 +55,6 @@ from masterHeader_wrapper import *
 import time
 __version__ = '2013.01.18'
 __docformat__ = 'restructuredtext en'
-#__all__ = ['API', 'Lucam', 'LucamEnumCameras', 'LucamNumCameras',
-#           'LucamError', 'LucamGetLastError', 'LucamSynchronousSnapshots',
-#           'LucamPreviewAVI', 'LucamConvertBmp24ToRgb24']
 
 
 def API():
