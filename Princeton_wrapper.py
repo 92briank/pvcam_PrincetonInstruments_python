@@ -40,7 +40,7 @@ Examples
 >>> from Princeton_wrapper import Princeton
 >>> import matplotlib.pyplot as plt
 >>> camera = Princeton()
->>> image = camera.TakePicture()
+>>> image = camera.takePicture()
 >>> plt.imshow(image)
 >>> camera.close()
 
@@ -51,7 +51,7 @@ from __future__ import division
 import sys
 import ctypes as ct
 import numpy
-from masterHeader_wrapper import *
+from master_Header_wrapper import *
 import time
 __version__ = '2013.01.18'
 __docformat__ = 'restructuredtext en'
@@ -859,10 +859,7 @@ class Princeton(object):
 
     """
     
-    sizeROIfull = 1024
-    _ROIfull = API.rgn_type(0,sizeROIfull-1,1,0,sizeROIfull-1,1)
     numberPicturesToTake = 1
-    
     
     PropertyLengthStrings = {'CCD_NAME_LEN':	17,
         'ERROR_MSG_LEN':	255,
@@ -1151,13 +1148,14 @@ class Princeton(object):
         self._handle = phandle.contents
 #        Set the temperature to 20°C just in case
         self.setParameterValue('TEMP_SETPOINT',2000)
-        self.setExposureTime(10000,ExposureUnits.microsecond)
+        self.setExposureTime(1,ExposureUnits.microsecond)
         self.setParameterValue('EXP_TIME',self.expTime)
-        self._ROI = [self._ROIfull]
-        self._ROIsizes =[ self.sizeROIfull]
-        self._ROIsizep = [self.sizeROIfull]
+#       Set the camera ROI
+        self._ROIsizes, self._ROIsizep = self.getCameraSize()
         self._ROIbins = [1]
         self._ROIbinp = [1]
+        self._ROIfull = API.rgn_type(0,self._ROIsizes-1,self._ROIbins,0,self._ROIsizep-1,self._ROIbinp)
+        self._ROI = [self._ROIfull]
         self._exposureMode = ExposureMode.timed
         self._currentBuffer = int16(0) 
         self._circularBufferMode = CircularBufferMode.overwrite
@@ -1198,6 +1196,10 @@ class Princeton(object):
         self._camname = camname.value
         return self._camname
         
+    def getCameraSize(self):
+        """Returns the detector's dimensions in pixels.
+        """
+        return self.getParameterCurrentValue(API.PARAM_SER_SIZE), self.getParameterCurrentValue(API.PARAM_PAR_SIZE)   
         
     def getCameraName(self):
         """Returns the name of the camera given by the program.
