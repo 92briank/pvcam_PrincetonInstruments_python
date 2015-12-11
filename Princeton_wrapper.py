@@ -1154,7 +1154,7 @@ class Princeton(object):
         self._ROIsizes, self._ROIsizep = self.getCameraSize()
         self._ROIbins = 1
         self._ROIbinp = 1
-        print API.rgn_type(0, self._ROIsizes-1, self._ROIbins, 0, self._ROIsizep-1, self._ROIbinp)
+#        print API.rgn_type(0, self._ROIsizes-1, self._ROIbins, 0, self._ROIsizep-1, self._ROIbinp)
         self._ROIfull = API.rgn_type(0, self._ROIsizes-1, self._ROIbins, 0, self._ROIsizep-1, self._ROIbinp)
         self._ROI = [self._ROIfull]
         self._exposureMode = ExposureMode.timed
@@ -1683,7 +1683,7 @@ class Princeton(object):
         pixelStream : c_types array of int16
             """
 #        For our 16-bit camera :
-        pixelStreamtype = int32 * int(sizeStream/2)
+        pixelStreamtype = int32 * int(sizeStream / 2)
         pixelStream = pixelStreamtype()
         if API.pl_exp_start_seq(self._handle, pixelStream) == 0:
             raise PrincetonError(API.pl_error_code())
@@ -1704,7 +1704,7 @@ class Princeton(object):
         pixelStream : c_types array of int16
             """
 #        For our 16-bit camera :
-        pixelStreamtype = uns16 * int(sizeBuffer/2)
+        pixelStreamtype = uns16 * int(sizeBuffer / 2)
         pixelStream = pixelStreamtype()
         sizeBufferC = uns32(sizeBuffer)
         if API.pl_exp_start_cont(self._handle, pixelStream, sizeBufferC) == 0:
@@ -1907,20 +1907,20 @@ class Princeton(object):
         """
         exposureC = uns16(exposureBuffer)
         (numberROIsC, arrayROIs) = self._processROIforAPI()
-        pixelPerROI = numpy.array(self.ROIsizep)*numpy.array(self.ROIsizes)/numpy.array(self.ROIbinp)*numpy.array(self.ROIbins)
+        pixelPerROI = numpy.array(self.ROIsizep) * numpy.array(self.ROIsizes) / numpy.array(self.ROIbinp) * numpy.array(self.ROIbins)
         pixelPerROI = pixelPerROI.astype(int)
         numberROIs = numberROIsC.value
         arraylist = uns16_ptr * numberROIs
         arraylist = arraylist()
         for i in range(numberROIS):
-            arraylist[i] = (uns16*pixelPerROI[i])()
+            arraylist[i] = (uns16 * pixelPerROI[i])()
         if API.pl_exp_unravel(self._handle, exposureC, frame, numberROIsC, arrayROIs, arraylist) == 0:
             raise PrincetonError(API.pl_error_code())
         images = []
         for i in range(numberROIS):
             table = arraylist[i]
             table = table[:]
-            images.append(numpy.reshape(numpy.array(table), (self.ROIsizep[i]/self.ROIbinp[i], self.ROIsizes[i]/self.ROIbins[i])))
+            images.append(numpy.reshape(numpy.array(table), (self.ROIsizep[i] / self.ROIbinp[i], self.ROIsizes[i] / self.ROIbins[i])))
         return images
             
     def ioClearScriptControl(self):
@@ -2216,17 +2216,17 @@ class Princeton(object):
 
     def _get_temperature(self):
         """ Get the current temperature """
-        return self.getParameterCurrentValue('TEMP')/100.
+        return self.getParameterCurrentValue('TEMP') / 100.
 
     temperature = property(_get_temperature)
 
     def _get_setpoint_temperature(self):
-        return self.getParameterCurrentValue('TEMP_SETPOINT')/100.
+        return self.getParameterCurrentValue('TEMP_SETPOINT') / 100.
 
     def _set_setpoint_temperature(self, val):
         if  val < -70 or val > 20:
             raise Exception("setpoint temeprature should be between -70 and 20, not {val}".format(val=val))
-        return self.setParameterValue('TEMP_SETPOINT', val*100)
+        return self.setParameterValue('TEMP_SETPOINT', val * 100)
         
 #    for key in ...:
 #        _tmp = property(lambda self:self.setParameterCurrentValue(key))
@@ -2534,7 +2534,7 @@ class Princeton(object):
                 (sizei, sizej) = self.bufferGetImageSize(imageHandle)
 #                Get the image
                 imagePointer = self.bufferGetImagePointer(imageHandle)
-                image = imagePointer[0:(sizei*sizej)]
+                image = imagePointer[0:(sizei * sizej)]
                 regions.append(numpy.reshape(numpy.array(image), (sizei, sizej)))
 #                Get the informations
                 (bini, binj) = self.bufferGetImageBinningFactors(imageHandle)
@@ -2613,7 +2613,7 @@ class Princeton(object):
             
     def startContinuous(self):
         sizeStream = self.setupExposureContinuous()
-        sizeBuffer = 5*sizeStream
+        sizeBuffer = 5 * sizeStream
         pixelStream = self._startExposureContinuous(sizeStream, sizeBuffer)
         self._continuousPixelStream = pixelStream
         
@@ -2624,9 +2624,9 @@ class Princeton(object):
         frame = self._exposureGetLatestFrame()
         if len(self.ROI) == 1:
             roi = self.ROI[0]
-            sizei = int((roi[1] - roi[0] + 1)/roi[2])
-            sizej = int((roi[4] - roi[3] + 1)/roi[5])
-            image = frame[0:(sizei*sizej)]
+            sizei = int((roi[1] - roi[0] + 1) / roi[2])
+            sizej = int((roi[4] - roi[3] + 1) / roi[5])
+            image = frame[0:(sizei * sizej)]
             return numpy.reshape(numpy.array(image), (sizei, sizej))
         
 
