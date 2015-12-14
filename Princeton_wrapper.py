@@ -40,8 +40,8 @@ Examples
 >>> from Princeton_wrapper import Princeton
 >>> import matplotlib.pyplot as plt
 >>> camera = Princeton()  # initialise with 2D ROI 
->>> #set temperature (celcius)
->>> camera.setpoint_temperature = -70
+>>> camera.setpoint_temperature = -70  #set temperature (celcius)
+>>> camera.gain = 1  #set gain
 >>> 
 >>> image = camera.takePicture()  # acquisition
 >>> plt.imshow(image[0][0][0])
@@ -1533,7 +1533,6 @@ class Princeton(object):
         The value of the parameter in the right type
         """
         return self.getParameterValue(parameter, AttributeType.defaultValue)
-        
             
     def setParameterValue(self, parameter, setValue):
         """Sets the value of the parameter defined by parameter to the value 
@@ -2245,6 +2244,14 @@ class Princeton(object):
 #        exec(key + '=_tmp')
         
     setpoint_temperature = property(_get_setpoint_temperature, _set_setpoint_temperature)      
+
+    def _get_gain(self):
+        return self.getParameterCurrentValue('GAIN_INDEX')
+
+    def _set_gain(self, val):
+        return self.setParameterValue('GAIN_INDEX', val)
+                
+    gain = property(_get_gain, _set_gain)      
           
     def setExposureTime(self, exposureTime, exposureUnits):
         """Set the exposure time.
