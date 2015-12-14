@@ -1147,7 +1147,7 @@ class Princeton(object):
             raise PrincetonError(API.pl_error_code())
         self._handle = phandle.contents
 #        Set the temperature to 20°C just in case
-        self.setParameterValue('TEMP_SETPOINT', 2000)
+        self.setpoint_temperature = 20
         self.setExposureTime(1, ExposureUnits.microsecond)
         self.setParameterValue('EXP_TIME', self.expTime)
 #       Set the camera ROI
@@ -2224,8 +2224,8 @@ class Princeton(object):
         return self.getParameterCurrentValue('TEMP_SETPOINT') / 100.
 
     def _set_setpoint_temperature(self, val):
-        if  val < -70 or val > 20:
-            raise Exception("setpoint temeprature should be between -70 and 20, not {val}".format(val=val))
+        if  val < -110 or val > 20:  # some camera operate at -100 C
+            raise Exception("setpoint temperature should be between -110 and 20, not {val}".format(val=val))
         return self.setParameterValue('TEMP_SETPOINT', val * 100)
         
 #    for key in ...:
