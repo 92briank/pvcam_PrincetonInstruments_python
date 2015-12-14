@@ -1151,12 +1151,10 @@ class Princeton(object):
         self.setExposureTime(1, ExposureUnits.microsecond)
         self.setParameterValue('EXP_TIME', self.expTime)
 #       Set the camera ROI
-        ROIsizes, ROIsizep = self.getCameraSize()
-        self._ROIsizes = [ROIsizes]
-        self._ROIsizep = [ROIsizep]
-        self._ROIbins = [1]
-        self._ROIbinp = [1]
-        self._ROIfull = API.rgn_type(0, self._ROIsizes[0]-1, self._ROIbins[0], 0, self._ROIsizep[0]-1, self._ROIbinp[0])
+        Camerasizes, Camerasizep = self.getCameraSize()
+        bins = 1
+        binp = 1
+        self._ROIfull = API.rgn_type(0, Camerasizes-1, bins, 0, Camerasizep-1, binp)
         self._ROI = [self._ROIfull]
         self._exposureMode = ExposureMode.timed
         self._currentBuffer = int16(0) 
@@ -2286,19 +2284,11 @@ class Princeton(object):
         s1, s2, sbin, p1, p2, pbin = ROI
 
         self._ROI.append(API.rgn_type(s1, s2, sbin, p1, p2, pbin))
-        self._ROIsizes.append(s2-s1+1)
-        self._ROIsizep.append(p2-p1+1)
-        self._ROIbins.append(sbin)
-        self._ROIbinp.append(pbin)   
         
     def removeLastExposureROI(self):
         """Removes the last exposure Region Of Interest (ROI) in the lists _ROI."""
         
         self._ROI.pop()
-        self._ROIsizes.pop()
-        self._ROIsizep.pop()
-        self._ROIbins.pop()
-        self._ROIbinp.pop()
         
     def changeLastExposureROI(self, ROI):
         """Changes the last the exposure Region Of Interest (ROI) in the lists _ROI. Takes a tuple 
@@ -2381,25 +2371,45 @@ class Princeton(object):
         
     def _getROIsizep(self):
         """Get the p-size of the Region Of Interest (ROI). """
-        return self._ROIsizep
+        ROIs = self.ROI
+        size = []
+        for i in range(len(ROIs)): 
+            s1, s2, sbin, p1, p2, pbin = ROIs[i] 
+            size.append(p2-p1+1)
+        return size
         
     ROIsizep = property(_getROIsizep)  
         
     def _getROIsizes(self):
         """Get the s-size of the Region Of Interest (ROI). """
-        return self._ROIsizes
+        ROIs = self.ROI
+        size = []
+        for i in range(len(ROIs)): 
+            s1, s2, sbin, p1, p2, pbin = ROIs[i] 
+            size.append(s2-s1+1)
+        return size
         
     ROIsizes = property(_getROIsizes)  
         
     def _getROIbins(self):
         """Get the p-binning of the Region Of Interest (ROI). """
-        return self._ROIbins
+        ROIs = self.ROI
+        bin = []
+        for i in range(len(ROIs)): 
+            s1, s2, sbin, p1, p2, pbin = ROIs[i] 
+            bin.append(sbin)
+        return bin
         
     ROIbins = property(_getROIbins) 
         
     def _getROIbinp(self):
         """Get the s-binning of the Region Of Interest (ROI). """
-        return self._ROIbinp
+        ROIs = self.ROI
+        bin = []
+        for i in range(len(ROIs)): 
+            s1, s2, sbin, p1, p2, pbin = ROIs[i] 
+            bin.append(pbin)
+        return bin
         
     ROIbinp = property(_getROIbinp) 
         
