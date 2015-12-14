@@ -1151,11 +1151,12 @@ class Princeton(object):
         self.setExposureTime(1, ExposureUnits.microsecond)
         self.setParameterValue('EXP_TIME', self.expTime)
 #       Set the camera ROI
-        self._ROIsizes, self._ROIsizep = self.getCameraSize()
-        self._ROIbins = 1
-        self._ROIbinp = 1
-#        print API.rgn_type(0, self._ROIsizes-1, self._ROIbins, 0, self._ROIsizep-1, self._ROIbinp)
-        self._ROIfull = API.rgn_type(0, self._ROIsizes-1, self._ROIbins, 0, self._ROIsizep-1, self._ROIbinp)
+        ROIsizes, ROIsizep = self.getCameraSize()
+        self._ROIsizes = [ROIsizes]
+        self._ROIsizep = [ROIsizep]
+        self._ROIbins = [1]
+        self._ROIbinp = [1]
+        self._ROIfull = API.rgn_type(0, self._ROIsizes[0]-1, self._ROIbins[0], 0, self._ROIsizep[0]-1, self._ROIbinp[0])
         self._ROI = [self._ROIfull]
         self._exposureMode = ExposureMode.timed
         self._currentBuffer = int16(0) 
@@ -2319,6 +2320,7 @@ class Princeton(object):
         
         pbin : data binning on the ps-axis"""
 
+        s1, s2, sbin, p1, p2, pbin = ROI
         self.removeLastExposureROI()
         self.addExposureROI(ROI)
         
