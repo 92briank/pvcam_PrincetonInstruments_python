@@ -39,9 +39,21 @@ Examples
 --------
 >>> from Princeton_wrapper import Princeton
 >>> import matplotlib.pyplot as plt
->>> camera = Princeton()
->>> image = camera.takePicture()
->>> plt.imshow(image)
+>>> camera = Princeton()  # initialise with 2D ROI 
+>>> #set temperature (celcius)
+>>> camera.setpoint_temperature = -70
+>>> 
+>>> image = camera.takePicture()  # acquisition
+>>> plt.imshow(image[0][0][0])
+>>>
+>>> #set camera to 1D (vertical binning) acquisition
+>>> s1, s2, sbin, p1, p2, pbin = camera.ROI[0]
+>>> camera.removeLastExposureROI()
+>>> camera.addExposureROI((s1, s2, sbin, p1, p2, p2-p1+1))
+>>> spectrum = camera.takePicture()
+>>> pl.plot(spectrum[0][0][0][0])
+>>>
+>>  #close communication
 >>> camera.close()
 
 
@@ -1111,7 +1123,6 @@ class Princeton(object):
         2:	'read/write',
         3:	'existCheckOnly',
         4:	'write only'}
-        
     
         
     class ParamAccess(Enum):
@@ -1146,8 +1157,9 @@ class Princeton(object):
         if API.pl_cam_open(camname, phandle, API.OPEN_EXCLUSIVE) == 0:
             raise PrincetonError(API.pl_error_code())
         self._handle = phandle.contents
-#        Set the temperature to 20°C just in case
+#       Set the temperature to 20°C just in case
         self.setpoint_temperature = 20
+#       Set the exposure time
         self.setExposureTime(1, ExposureUnits.microsecond)
         self.setParameterValue('EXP_TIME', self.expTime)
 #       Set the camera ROI
@@ -1156,6 +1168,7 @@ class Princeton(object):
         binp = 1
         self._ROIfull = API.rgn_type(0, Camerasizes-1, bins, 0, Camerasizep-1, binp)
         self._ROI = [self._ROIfull]
+#       Set the exposure mode
         self._exposureMode = ExposureMode.timed
         self._currentBuffer = int16(0) 
         self._circularBufferMode = CircularBufferMode.overwrite
@@ -1165,7 +1178,6 @@ class Princeton(object):
 #==============================================================================
 #     Class 0 functions
 #==============================================================================
-        
         
     def openCamera(self, number):
         """Open connection to Princeton camera.
