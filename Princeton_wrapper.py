@@ -2224,6 +2224,7 @@ class Princeton(object):
 #     Properties for our application
 #============================================================================== 
 
+#   Actual Temperature
     def _get_temperature(self):
         """ Get the current temperature """
         return self.getParameterCurrentValue('TEMP') / 100.
@@ -2233,18 +2234,20 @@ class Princeton(object):
     def _get_setpoint_temperature(self):
         return self.getParameterCurrentValue('TEMP_SETPOINT') / 100.
 
+#   Setpoint Temperature
     def _set_setpoint_temperature(self, val):
         if  val < -110 or val > 20:  # some camera operate at -100 C
             raise Exception("setpoint temperature should be between -110 and 20, not {val}".format(val=val))
         return self.setParameterValue('TEMP_SETPOINT', val * 100)
         
+    setpoint_temperature = property(_get_setpoint_temperature, _set_setpoint_temperature)      
+
 #    for key in ...:
 #        _tmp = property(lambda self:self.setParameterCurrentValue(key))
 #        name = key.lower()
 #        exec(key + '=_tmp')
         
-    setpoint_temperature = property(_get_setpoint_temperature, _set_setpoint_temperature)      
-
+#   Gain
     def _get_gain(self):
         return self.getParameterCurrentValue('GAIN_INDEX')
 
@@ -2253,6 +2256,17 @@ class Princeton(object):
                 
     gain = property(_get_gain, _set_gain)      
           
+#   ADC speed
+    def _get_speed(self):
+        return self.getParameterCurrentValue('SPDTAB_INDEX')
+
+    def _set_speed(self, val):
+        return self.setParameterValue('SPDTAB_INDEX', val)
+                
+    speed = property(_get_speed, _set_speed)      
+                    
+#   Exposure time
+
     def setExposureTime(self, exposureTime, exposureUnits):
         """Set the exposure time.
         
@@ -2281,7 +2295,7 @@ class Princeton(object):
         
     exposureTime = property(_getExposureTime)      
         
-#    def addExposureROI(self, (s1, s2, sbin, p1, p2, pbin)):
+#   ROI
     def addExposureROI(self, ROI):
         """Adds the exposure Region Of Interest (ROI) in the lists _ROI. Takes a tuple 
         (s1, s2, sbin, p1, p2, pbin) 
@@ -2432,6 +2446,7 @@ class Princeton(object):
         
     ROIbinp = property(_getROIbinp) 
         
+#   Exposure Mode
     def _getExposureMode(self):
         """Gets the exposure mode. Possible modes are values of ExposureMode
         enumerator:
@@ -2472,11 +2487,13 @@ class Princeton(object):
         
     exposureMode = property(_getExposureMode,_setExposureMode)
     
+#   Kinetics
     def _isKineticsEnabled(self):
         return self.getParameterCurrentValue(API.PARAM_PMODE)[0] == 'Kinetics'
         
     kineticsEnabled = property(_isKineticsEnabled)
     
+#   Shutter
     def _getShutterState(self):
         return ShutterState(self.getParameterCurrentValue(API.PARAM_SHTR_OPEN_MODE)[1])
         
