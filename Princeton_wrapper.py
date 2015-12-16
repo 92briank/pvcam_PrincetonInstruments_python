@@ -2225,7 +2225,6 @@ class Princeton(object):
         -------
         pitchs : distance center-to-center between pixels (serial direction) in nanometer
         pitchp : distance center-to-center between pixels (parallel direction) in nanometer
-       
         """
         return self.getParameterCurrentValue('PIX_SER_DIST'), self.getParameterCurrentValue('PIX_PAR_DIST')
               
@@ -2450,6 +2449,16 @@ class Princeton(object):
         self.setParameterValue(API.PARAM_SHTR_OPEN_MODE, shutterMode.value)
         
     shutterOpenMode = property(_getShutterOpenMode,_setShutterOpenMode)
+            
+#   Logic Output
+    def _getLogicOutput(self):
+        return LogicOutput(self.getParameterCurrentValue('LOGIC_OUTPUT')[1])
+    
+    def _setLogicOutput(self, option):
+        self.setParameterValue('LOGIC_OUTPUT', option.value)
+        
+    logicOutput = property(_getLogicOutput,_setLogicOutput)
+        
             
 #==============================================================================
 #     Functions for our application
