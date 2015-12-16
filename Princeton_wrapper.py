@@ -54,9 +54,8 @@ Examples
 >>>
 >>  #close communication
 >>> camera.close()
-
-
 """
+
 from __future__ import division
 
 import sys
@@ -1569,7 +1568,7 @@ class Princeton(object):
         """
         self._circularBufferMode = val 
         
-    circularBufferMode = property(_getCircularBufferMode,_setCircularBufferMode)
+    circularBufferMode = property(_getCircularBufferMode, _setCircularBufferMode)
         
     def setupExposureSequential(self):
         """Initializes all parameters to take a sequence of pictures.
@@ -1632,7 +1631,7 @@ class Princeton(object):
         """
         self._currentBuffer = int16(val) 
         
-    currentBuffer = property(_getCurrentBuffer,_setCurrentBuffer)
+    currentBuffer = property(_getCurrentBuffer, _setCurrentBuffer)
         
     def startExposureSequential(self, sizeStream):
         """Starts the acquisition of a sequence of pictures after the call of setupExposureSequential().
@@ -2423,7 +2422,7 @@ class Princeton(object):
         """
         self._exposureMode = val 
         
-    exposureMode = property(_getExposureMode,_setExposureMode)
+    exposureMode = property(_getExposureMode, _setExposureMode)
     
 #   Kinetics
     def _isKineticsEnabled(self):
@@ -2448,7 +2447,7 @@ class Princeton(object):
     def _setShutterOpenMode(self, shutterMode):
         self.setParameterValue(API.PARAM_SHTR_OPEN_MODE, shutterMode.value)
         
-    shutterOpenMode = property(_getShutterOpenMode,_setShutterOpenMode)
+    shutterOpenMode = property(_getShutterOpenMode, _setShutterOpenMode)
             
 #   Logic Output
     def _getLogicOutput(self):
@@ -2457,7 +2456,7 @@ class Princeton(object):
     def _setLogicOutput(self, option):
         self.setParameterValue('LOGIC_OUTPUT', option.value)
         
-    logicOutput = property(_getLogicOutput,_setLogicOutput)
+    logicOutput = property(_getLogicOutput, _setLogicOutput)
         
             
 #==============================================================================
@@ -2549,12 +2548,13 @@ class Princeton(object):
                 infoRegion = infoRegion + 'offsetp\t' + str(offsetp) + '\n'
                 infoRegion = infoRegion + 'exposureTime (ms)\t' + str(expTime) + '\n'
                 infoRegion = infoRegion + 'precision (ms)\t' + str(precision) + '\n'
+                infoRegion = infoRegion + 'shutterMode\t' + str(self.shutterOpenMode) + '\n'
+                infoRegion = infoRegion + 'ADCspeedIndex\t' + str(self.speed) + '\n'
+                infoRegion = infoRegion + 'ADCgainIndex\t' + str(self.gain) + '\n'
                 infoRegions.append(infoRegion)
             images.append(regions)
             infos.append(infoRegions)
-        return images, infos
-        
-    
+        return images, infos   
         
     def enableKineticsMode(self, kineticsWindow = 256, parallelShiftTime = None):
         """Enables the kinetics mode.
