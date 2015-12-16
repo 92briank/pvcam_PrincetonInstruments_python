@@ -70,9 +70,7 @@ __docformat__ = 'restructuredtext en'
 
 
 def API():
-    """Return ctypes interface to the Pvcam32.dll dynamic library..
-
-    """
+    """Return ctypes interface to the Pvcam32.dll dynamic library.."""
     
 #    /*********************** Constant & Type Definitions *************************/
 #    
@@ -91,7 +89,6 @@ def API():
     TYPE_BOOLEAN = 11
     TYPE_VOID_PTR = 14
     TYPE_VOID_PTR_PTR = 15
-    
     
     # defines for classes                                                       */
     CLASS0 = 0          # Camera Communications                      */
@@ -117,7 +114,6 @@ def API():
     CLASS99 = 99         # Trenton diagnostics.                       */
     #*********************** Parameter IDs **************************************/
     # Format: TTCCxxxx, where TT = Data type, CC = Class, xxxx = ID number      */
-    
     
             # DEVICE DRIVER PARAMETERS (CLASS 0) */
     
@@ -237,7 +233,6 @@ def API():
     # Can camera perform HW accumulation */
     PARAM_ACCUM_CAPABLE =        ((CLASS2<<16) + (TYPE_BOOLEAN<<24)   + 538) # Not available for our camera //Laura 16/01/2015
     
-    
     PARAM_FTSCAN =              ((CLASS2<<16) + (TYPE_UNS16<<24)     +  59) # 0 for us //Laura 16/01/2015
     
     # customize chip dimension */
@@ -249,21 +244,14 @@ def API():
     PARAM_SER_SHIFT_TIME =      ((CLASS2<<16) + (TYPE_UNS32<<24)     + 546)
     PARAM_PAR_SHIFT_INDEX =     ((CLASS2<<16) + (TYPE_UNS32<<24)     + 547)
     
-    
     # Kinetics Window Size */
     PARAM_KIN_WIN_SIZE =        ((CLASS2<<16) + (TYPE_UNS16<<24)     + 126) # 1 for us //Laura 16/01/2015
-    
-    
-    
     
     # General parameters */
     # Is the controller on and running? */
     PARAM_CONTROLLER_ALIVE =   ((CLASS2<<16) + (TYPE_BOOLEAN<<24)   + 168)
     # Readout time of current ROI, in ms */
     PARAM_READOUT_TIME =        ((CLASS2<<16) + (TYPE_FLT64<<24)     + 179)
-    
-    
-    
     
     
             # CAMERA PARAMETERS (CLASS 2) */
@@ -332,11 +320,9 @@ def API():
     PARAM_TTL_LINES =           ((CLASS2<<16) + (TYPE_INT32<<24)     +  91)
     PARAM_TTL_DIR_CTRL =        ((CLASS2<<16) + (TYPE_INT32<<24)     + 355)
     
-    
             # Special Features */
     
     PARAM_DITHERING =           ((CLASS2<<16) + (TYPE_BOOLEAN<<24)   + 359) # Not available for our camera //Laura 16/01/2015
-    
     
     
             # ACQUISITION PARAMETERS (CLASS 3) */
@@ -1180,9 +1166,7 @@ class Princeton(object):
 #==============================================================================
         
     def openCamera(self, number):
-        """Open connection to Princeton camera.
-        
-        """
+        """Open connection to Princeton camera."""
         self.getCameraNameWithNumber(number)
         phandle = int16_ptr(int16(0))
         camname = ct.create_string_buffer(self._camname)
@@ -1200,7 +1184,6 @@ class Princeton(object):
 
         number : int
             Camera number. Must be in range 0 through PrincetonNumCameras()-1.
-        
         """
         camname = ct.create_string_buffer(CAM_NAME_LEN)
         if API.pl_cam_get_name(number, camname) == 0:
@@ -1209,20 +1192,15 @@ class Princeton(object):
         return self._camname
         
     def getCameraSize(self):
-        """Returns the detector's dimensions in pixels.
-        """
+        """Returns the detector's dimensions in pixels."""
         return self.getParameterCurrentValue(API.PARAM_SER_SIZE), self.getParameterCurrentValue(API.PARAM_PAR_SIZE)   
         
     def getCameraName(self):
-        """Returns the name of the camera given by the program.
-        
-        """
+        """Returns the name of the camera given by the program."""
         return self._camname
         
     def close(self):
-        """Closes all (connection to Princeton camera, pvcam, sequence mode, bufferfunctions).
-        
-        """
+        """Closes all (connection to Princeton camera, pvcam, sequence mode, bufferfunctions)."""
         if not self._currentBuffer.value == 0:
             self.bufferFree(self._currentBuffer)
         self.closeCamera()
@@ -1231,23 +1209,18 @@ class Princeton(object):
         self.uninitPVCAM()
             
     def closeCamera(self):
-        """Close connection to Princeton camera.
-        
-        """
+        """Close connection to Princeton camera."""
         if API.pl_cam_close(self._handle) == 0:
             raise PrincetonError(API.pl_error_code())
             
     
     def checkValidHandle(self):
-        """Checks that the handle of the camera is a valid one.
-        
-        """
+        """Checks that the handle of the camera is a valid one."""
         return API.pl_cam_check(self._handle) == 1
     
     def checkCameraOK(self):
         """Checks that there is no problem with the camera that would prevent
         from taking a picture.
-        
         """
         if API.pl_cam_get_diags(self._handle) == 0:
             raise PrincetonError(API.pl_error_code())
@@ -1255,18 +1228,14 @@ class Princeton(object):
         
         
     def getTotalNumberCamera(self):
-        """Returns the number of camera detected or raises an error.
-        
-        """
+        """Returns the number of camera detected or raises an error."""
         some_int = int16()
         if API.pl_cam_get_total(ct.byref(some_int)) == 0:
             raise PrincetonError(API.pl_error_code())
         return some_int.value
     
     def getDDIversion(self):
-        """Returns the version number of the current DDI (device driver interface).
-        
-        """
+        """Returns the version number of the current DDI (device driver interface)."""
         ddi = uns16()
         if API.pl_ddi_get_ver(ct.byref(ddi)) == 0:
             raise PrincetonError(API.pl_error_code())
@@ -1276,7 +1245,6 @@ class Princeton(object):
     def initPVCAM(self):
         """Checks that there is no problem with the camera that would prevent
         from taking a picture.
-        
         """
         if API.pl_pvcam_init() == 0:
             raise PrincetonError(API.pl_error_code())
@@ -1284,7 +1252,6 @@ class Princeton(object):
     def uninitPVCAM(self):
         """Checks that there is no problem with the camera that would prevent
         from taking a picture.
-        
         """
         if API.pl_pvcam_uninit() == 0:
             raise PrincetonError(API.pl_error_code())
@@ -1292,7 +1259,6 @@ class Princeton(object):
     def versionPVCAM(self):
         """Checks that there is no problem with the camera that would prevent
         from taking a picture.
-        
         """
         v = uns16()
         if API.pl_pvcam_get_ver(ct.byref(v)) == 0:
@@ -1315,7 +1281,6 @@ class Princeton(object):
         """Return code meesage the error defined by IDerrorCode.
 
         Error codes and messages can be found in PrincetonError.CODES.
-        
         
         Parameters
         ----------
@@ -1352,7 +1317,8 @@ class Princeton(object):
 
         Returns
         ----------
-        The value of the parameter in the right type"""
+        The value of the parameter in the right type
+        """
         paramCode = parameter
         if type(parameter) == str:
             if not self.ParamSet.has_key(parameter):
@@ -1377,7 +1343,8 @@ class Princeton(object):
 
         Returns
         ----------
-        The length of the char buffer to allocate"""
+        The length of the char buffer to allocate
+        """
         paramCode = parameter
         if type(parameter) == str:
             if not self.ParamSet.has_key(parameter):
@@ -1429,23 +1396,15 @@ class Princeton(object):
         mode : one of the enumerated type AttributeType :
         
             currentValue = 0 (result in type of param)
-            
             count = 1 (result in int)
-            
             typeValue = 2 (result in string)
-            
             minValue = 3 (result in type of param)
-            
             maxValue = 4 (result in type of param)
-            
             defaultValue = 5 (result in type of param)
-            
             increment = 6 (result in type of param)
-            
             access = 7 (result in string)
-            
             available = 8 (result in bool)
-            
+
             or the corresponding int
 
         Returns
@@ -1511,8 +1470,7 @@ class Princeton(object):
         parameter : string or long that defines the parameter
             Name of the parameter to read. All possible names are in the 
             dictionary Princeton.ParamSet.
-
-
+            
         Returns
         ----------
         The value of the parameter in the right type
@@ -1576,11 +1534,8 @@ class Princeton(object):
 #     Class 3 functions
 #==============================================================================
         
-    
     def exposureInitSequential(self):
-        """Initialize camera for data taking in sequential mode.
-
-        """
+        """Initialize camera for data taking in sequential mode."""
         if API.pl_exp_init_seq() == 0:
             raise PrincetonError(API.pl_error_code())
         
@@ -1591,10 +1546,9 @@ class Princeton(object):
         enumerator:
         
         none = 0
-        
         overwrite = 1
-        
-        nooverwrite = 2"""
+        nooverwrite = 2
+        """
         return self._circularBufferMode
         
     def _setCircularBufferMode(self, val):
@@ -1604,18 +1558,13 @@ class Princeton(object):
         enumerator:
         
         timed = 0
-        
         strobed = 1
-        
         bulb = 2
-        
         triggerFirst = 3
-        
         flash = 4
-        
         variableTimed = 5
-        
-        intStrobed = 6"""
+        intStrobed = 6
+        """
         self._circularBufferMode = val 
         
     circularBufferMode = property(_getCircularBufferMode,_setCircularBufferMode)
@@ -1632,7 +1581,8 @@ class Princeton(object):
         
         ROI : regions to record
         
-        expTime : exposure duration (in EXP_RES units)"""
+        expTime : exposure duration (in EXP_RES units)
+        """
         nPictures = uns16(self.numberPicturesToTake)
         sizeBuffer = uns32()
         mode = int16(self._exposureMode.value)
@@ -1656,8 +1606,8 @@ class Princeton(object):
             
         Returns
         ----------
-        sizeStream : required size of pixel stream"""
-        
+        sizeStream : required size of pixel stream
+        """
         sizeStream = uns32()
         mode = int16(self._exposureMode.value)
         circBuffMode = int16(self._circularBufferMode.value)
@@ -1669,13 +1619,15 @@ class Princeton(object):
     def _getCurrentBuffer(self):
         """NOT TESTED
         
-        Gets the current buffer"""
+        Gets the current buffer
+        """
         return self._currentBuffer
         
     def _setCurrentBuffer(self, val):
         """NOT TESTED
         
-        Sets the current buffer to the value which will be converted to an int16"""
+        Sets the current buffer to the value which will be converted to an int16.
+        """
         self._currentBuffer = int16(val) 
         
     currentBuffer = property(_getCurrentBuffer,_setCurrentBuffer)
@@ -1691,7 +1643,7 @@ class Princeton(object):
         Returns
         ----------
         pixelStream : c_types array of int16
-            """
+        """
 #        For our 16-bit camera :
         pixelStreamtype = int32 * int(sizeStream / 2)
         pixelStream = pixelStreamtype()
@@ -1712,7 +1664,7 @@ class Princeton(object):
         Returns
         ----------
         pixelStream : c_types array of int16
-            """
+        """
 #        For our 16-bit camera :
         pixelStreamtype = uns16 * int(sizeBuffer / 2)
         pixelStream = pixelStreamtype()
@@ -1732,7 +1684,7 @@ class Princeton(object):
         ----------
         pixelStream : c_types array of int16
         handleBuffer : int16 handle for a buffer
-            """
+        """
         handleBuffer = self._currentBuffer
         if API.pl_exp_finish_seq(self._handle, pixelStream, handleBuffer) == 0:
             raise PrincetonError(API.pl_error_code())
@@ -1756,7 +1708,7 @@ class Princeton(object):
         Parameters
         ----------
         pixelStream : c_types array of int16 where the pixels will be recorded
-            """
+        """
         if API.pl_exp_abort(self._handle, self.abortMode.value) == 0:
             raise PrincetonError(API.pl_error_code())
         
@@ -1771,7 +1723,7 @@ class Princeton(object):
         Returns
         ----------
         pixelStream : c_types array of int16
-            """
+        """
         pixelStream = self.startExposureSequential(sizeStream)
         (statusString, statusNumber, byteCount) = cam.exposureCheckStatus()
         statusNumberOld = statusNumber
@@ -1794,7 +1746,6 @@ class Princeton(object):
         4: Readout failed
         5: Acquisition in progress
         6: MAX_CAMERA_STATUS
-        
         """
         statusC = int16()
         byteCount = uns32()
@@ -1818,7 +1769,6 @@ class Princeton(object):
         4: Readout failed
         5: Acquisition in progress
         6: MAX_CAMERA_STATUS
-        
         """
         statusC = int16()
         bufferCount = uns32()
@@ -1889,8 +1839,7 @@ class Princeton(object):
         return bufferPtr
         
     def exposureUninit(self):
-        """Uninitializes the data collection function.
-        """
+        """Uninitializes the data collection function."""
         if API.pl_exp_uninit_seq() == 0:
             raise PrincetonError(API.pl_error_code())
             
@@ -1986,8 +1935,7 @@ class Princeton(object):
         return handleBufferC
             
     def bufferFree(self, handleBuffer = None):
-        """Frees the memory and the handle used by self._currentBuffer buffer.
-        """
+        """Frees the memory and the handle used by self._currentBuffer buffer."""
         if type(handleBuffer) == type(None):
             handleBuffer = self._currentBuffer
         if API.pl_buf_free(handleBuffer) == 0:
@@ -2207,18 +2155,14 @@ class Princeton(object):
             raise PrincetonError(API.pl_error_code())
             
     def bufferInit(self):
-        """Initializes the buffer functions, useful for exposures with multiple regions or complex sequences
-        """
+        """Initializes the buffer functions, useful for exposures with multiple regions or complex sequences."""
         if API.pl_buf_init() == 0:
             raise PrincetonError(API.pl_error_code())
             
     def bufferUninit(self):
-        """Uninitializes the buffer functions, useful for exposures with multiple regions or complex sequences
-        """
+        """Uninitializes the buffer functions, useful for exposures with multiple regions or complex sequences"""
         if API.pl_buf_uninit() == 0:
             raise PrincetonError(API.pl_error_code())
-            
-   
             
 #==============================================================================
 #     Properties for our application
@@ -2231,11 +2175,13 @@ class Princeton(object):
 
     temperature = property(_get_temperature)
 
+#   Setpoint Temperature
     def _get_setpoint_temperature(self):
+        """ Get the setpoint temperature """
         return self.getParameterCurrentValue('TEMP_SETPOINT') / 100.
 
-#   Setpoint Temperature
     def _set_setpoint_temperature(self, val):
+        """ Set the setpoint temperature """
         if  val < -110 or val > 20:  # some camera operate at -100 C
             raise Exception("setpoint temperature should be between -110 and 20, not {val}".format(val=val))
         return self.setParameterValue('TEMP_SETPOINT', val * 100)
@@ -2249,18 +2195,22 @@ class Princeton(object):
         
 #   Gain
     def _get_gain(self):
+        """ Get the ADC gain index """
         return self.getParameterCurrentValue('GAIN_INDEX')
 
     def _set_gain(self, val):
+        """ Set the ADC gain index """
         return self.setParameterValue('GAIN_INDEX', val)
                 
     gain = property(_get_gain, _set_gain)      
           
 #   ADC speed
     def _get_speed(self):
+        """ Get the ADC speed index """
         return self.getParameterCurrentValue('SPDTAB_INDEX')
 
     def _set_speed(self, val):
+        """ Set the ADC speed index """
         return self.setParameterValue('SPDTAB_INDEX', val)
                 
     speed = property(_get_speed, _set_speed)      
@@ -2286,8 +2236,7 @@ class Princeton(object):
         self.setParameterValue('EXP_TIME', self.expTime)
           
     def _getExposureTime(self):
-        """Get the exposure time in units given by EXP_RES.
-        """
+        """Get the exposure time in units given by EXP_RES."""
         PropertyFastExposureResolutionConstant = {0:' ms',
             1:' us'}
         units = PropertyFastExposureResolutionConstant.get(self.getParameterCurrentValue(API.PARAM_EXP_RES_INDEX))
@@ -2309,14 +2258,14 @@ class Princeton(object):
             sbin : data binning on the s-axis
             p1 : first parallel row of pixel to be taken into account (starts at 0)
             p2 : last parallel row of pixel to be taken into account (max at sizeCCD-1)
-            pbin : data binning on the ps-axis"""
+            pbin : data binning on the ps-axis
+        """
         s1, s2, sbin, p1, p2, pbin = ROI
 
         self._ROI.append(API.rgn_type(s1, s2, sbin, p1, p2, pbin))
         
     def removeLastExposureROI(self):
         """Removes the last exposure Region Of Interest (ROI) in the lists _ROI."""
-        
         self._ROI.pop()
         
     def changeLastExposureROI(self, ROI):
@@ -2332,11 +2281,31 @@ class Princeton(object):
             sbin : data binning on the s-axis
             p1 : first parallel row of pixel to be taken into account (starts at 0)
             p2 : last parallel row of pixel to be taken into account (max at sizeCCD-1)
-            pbin : data binning on the ps-axis"""
-
+            pbin : data binning on the ps-axis
+        """
         s1, s2, sbin, p1, p2, pbin = ROI
         self.removeLastExposureROI()
         self.addExposureROI(ROI)
+        
+    def _processROIforAPI(self):
+        """Prepares an uns16 that gives the number of ROI and an rgn_pointer to an
+        array of rgn_type that are the ROIs to be taken by.
+        
+        Returns
+        -------
+        numberROIsC : uns16 that gives the number of regions of interest
+        arrayROIs : ctypes array of ROI of type rgn_type
+        """
+        numberROIs = len(self.ROI)
+        arrayROIs = API.rgn_type * numberROIs
+        arrayROIs = arrayROIs()
+        numberROIsC = uns16(numberROIs)
+        print(numberROIsC)
+        print(arrayROIs)
+        #print(self._ROI)
+        for i in range(numberROIs):
+            arrayROIs[i] = self._ROI[i]
+        return numberROIsC, arrayROIs
         
     def _getExposureROI(self):
         """Get the exposure Region Of Interest (ROI). Returns a tuple 
@@ -2350,8 +2319,8 @@ class Princeton(object):
         sbin : data binning on the s-axis
         p1 : first parallel row of pixel to be taken into account (starts at 0)
         p2 : last parallel row of pixel to be taken into account (max at sizeCCD-1)
-        pbin : data binning on the ps-axis"""
-        
+        pbin : data binning on the ps-axis
+        """
         ROIs = []
         for i in range(len(self._ROI)):
             currentROI = self._ROI[i]
@@ -2363,26 +2332,6 @@ class Princeton(object):
             pbin = currentROI.pbin
             ROIs.append(((s1, s2, sbin, p1, p2, pbin)))
         return ROIs
-        
-    def _processROIforAPI(self):
-        """Prepares an uns16 that gives the number of ROI and an rgn_pointer to an
-        array of rgn_type that are the ROIs to be taken by.
-        
-        Returns
-        -------
-        numberROIsC : uns16 that gives the number of regions of interest
-        arrayROIs : ctypes array of ROI of type rgn_type"""
-        
-        numberROIs = len(self.ROI)
-        arrayROIs = API.rgn_type * numberROIs
-        arrayROIs = arrayROIs()
-        numberROIsC = uns16(numberROIs)
-        print(numberROIsC)
-        print(arrayROIs)
-        #print(self._ROI)
-        for i in range(numberROIs):
-            arrayROIs[i] = self._ROI[i]
-        return numberROIsC, arrayROIs
         
     ROI = property(_getExposureROI)  
         
@@ -2441,8 +2390,8 @@ class Princeton(object):
         triggerFirst = 3
         flash = 4
         variableTimed = 5
-        intStrobed = 6"""
-        
+        intStrobed = 6
+        """
         return self._exposureMode
         
     def _setExposureMode(self, val):
@@ -2455,8 +2404,8 @@ class Princeton(object):
         triggerFirst = 3
         flash = 4
         variableTimed = 5
-        intStrobed = 6"""
-        
+        intStrobed = 6
+        """
         self._exposureMode = val 
         
     exposureMode = property(_getExposureMode,_setExposureMode)
@@ -2485,14 +2434,10 @@ class Princeton(object):
         self.setParameterValue(API.PARAM_SHTR_OPEN_MODE, shutterMode.value)
         
     shutterOpenMode = property(_getShutterOpenMode,_setShutterOpenMode)
-    
-     
             
 #==============================================================================
 #     Functions for our application
 #==============================================================================
-    
-        
         
     def takePicture(self, optionDisplayMessage = True):
         """Takes picture(s) according to the parameters defined in the object."""
