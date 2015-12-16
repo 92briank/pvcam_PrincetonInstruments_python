@@ -1018,7 +1018,7 @@ class Princeton(object):
         API.PARAM_EXP_MIN_TIME:	flt64,
         API.PARAM_EXP_RES:	uns32,
         API.PARAM_EXP_RES_INDEX:	uns16,
-        API.PARAM_EXP_TIME:	uns16,
+        API.PARAM_EXP_TIME:	uns16,  # max 65535
         API.PARAM_FRAME_CAPABLE:	rs_bool,
         API.PARAM_FTSCAN:	uns16,
         API.PARAM_FWELL_CAPACITY:	uns32,
@@ -1577,11 +1577,8 @@ class Princeton(object):
         Uses some properties of the instance :
         
         _handle : identifier of the camera
-        
         numberPicturesToTake : number of images to take
-        
         ROI : regions to record
-        
         expTime : exposure duration (in EXP_RES units)
         """
         nPictures = uns16(self.numberPicturesToTake)
@@ -1598,11 +1595,8 @@ class Princeton(object):
         Initializes all parameters to take continuous pictures in a circular buffer.
         
         _handle : identifier of the camera
-        
         numberPicturesToTake : number of images to take
-        
         ROI : region to record
-        
         expTime : exposure duration (in EXP_RES units)
             
         Returns
@@ -1994,6 +1988,8 @@ class Princeton(object):
         Returns
         -------
         exposureDuration in msec
+        
+        BUG: seems to always return zero
         """
         exposureTimeC = uns32()
         exposureNumberC = int16(exposureNumber)
@@ -2236,10 +2232,8 @@ class Princeton(object):
         
         Parameters
         ----------
-
-        exposureTime : long that defines the exposure time in the unit defined 
-            somewhere else.
-            
+        exposureTime : exposure time in the unit defined in exposureUnits
+                        unsigned int (0 - 65535)
         exposureUnits : units defined in the enumerated typ ExposureUnits
         """
         if exposureUnits.value == 0:
