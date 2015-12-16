@@ -2303,17 +2303,13 @@ class Princeton(object):
         Parameters
         ----------
         
-        s1 : first series of pixel to be taken into account (starts at 0)
-        
-        s2 : last series of pixel to be taken into account (max at sizeCCD-1)
-        
-        sbin : data binning on the s-axis
-        
-        p1 : first parallel row of pixel to be taken into account (starts at 0)
-        
-        p2 : last parallel row of pixel to be taken into account (max at sizeCCD-1)
-        
-        pbin : data binning on the ps-axis"""
+        ROI = (s1, s2, sbin, p1, p2, pbin)
+            s1 : first series of pixel to be taken into account (starts at 0)
+            s2 : last series of pixel to be taken into account (max at sizeCCD-1)
+            sbin : data binning on the s-axis
+            p1 : first parallel row of pixel to be taken into account (starts at 0)
+            p2 : last parallel row of pixel to be taken into account (max at sizeCCD-1)
+            pbin : data binning on the ps-axis"""
         s1, s2, sbin, p1, p2, pbin = ROI
 
         self._ROI.append(API.rgn_type(s1, s2, sbin, p1, p2, pbin))
@@ -2329,19 +2325,14 @@ class Princeton(object):
         
         Parameters
         ----------
+        
         ROI = (s1, s2, sbin, p1, p2, pbin)
-        
-        s1 : first series of pixel to be taken into account (starts at 0)
-        
-        s2 : last series of pixel to be taken into account (max at sizeCCD-1)
-        
-        sbin : data binning on the s-axis
-        
-        p1 : first parallel row of pixel to be taken into account (starts at 0)
-        
-        p2 : last parallel row of pixel to be taken into account (max at sizeCCD-1)
-        
-        pbin : data binning on the ps-axis"""
+            s1 : first series of pixel to be taken into account (starts at 0)
+            s2 : last series of pixel to be taken into account (max at sizeCCD-1)
+            sbin : data binning on the s-axis
+            p1 : first parallel row of pixel to be taken into account (starts at 0)
+            p2 : last parallel row of pixel to be taken into account (max at sizeCCD-1)
+            pbin : data binning on the ps-axis"""
 
         s1, s2, sbin, p1, p2, pbin = ROI
         self.removeLastExposureROI()
@@ -2355,18 +2346,12 @@ class Princeton(object):
         ----------
         
         s1 : first series of pixel to be taken into account (starts at 0)
-        
         s2 : last series of pixel to be taken into account (max at sizeCCD-1)
-        
         sbin : data binning on the s-axis
-        
         p1 : first parallel row of pixel to be taken into account (starts at 0)
-        
         p2 : last parallel row of pixel to be taken into account (max at sizeCCD-1)
+        pbin : data binning on the ps-axis"""
         
-        pbin : data binning on the ps-axis
-        
-        """
         ROIs = []
         for i in range(len(self._ROI)):
             currentROI = self._ROI[i]
@@ -2386,16 +2371,15 @@ class Princeton(object):
         Returns
         -------
         numberROIsC : uns16 that gives the number of regions of interest
-        arrayROIs : ctypes array of ROI of type rgn_type
+        arrayROIs : ctypes array of ROI of type rgn_type"""
         
-        """
-        numberROIs = len(self._ROI)
+        numberROIs = len(self.ROI)
         arrayROIs = API.rgn_type * numberROIs
         arrayROIs = arrayROIs()
         numberROIsC = uns16(numberROIs)
         print(numberROIsC)
         print(arrayROIs)
-        print(self._ROI)
+        #print(self._ROI)
         for i in range(numberROIs):
             arrayROIs[i] = self._ROI[i]
         return numberROIsC, arrayROIs
@@ -2452,18 +2436,13 @@ class Princeton(object):
         enumerator:
         
         timed = 0
-        
         strobed = 1
-        
         bulb = 2
-        
         triggerFirst = 3
-        
         flash = 4
-        
         variableTimed = 5
-        
         intStrobed = 6"""
+        
         return self._exposureMode
         
     def _setExposureMode(self, val):
@@ -2471,18 +2450,13 @@ class Princeton(object):
         enumerator:
         
         timed = 0
-        
         strobed = 1
-        
         bulb = 2
-        
         triggerFirst = 3
-        
         flash = 4
-        
         variableTimed = 5
-        
         intStrobed = 6"""
+        
         self._exposureMode = val 
         
     exposureMode = property(_getExposureMode,_setExposureMode)
@@ -2493,6 +2467,11 @@ class Princeton(object):
         
     kineticsEnabled = property(_isKineticsEnabled)
     
+    def _getKineticsWindowSize(self):
+        return self.getParameterCurrentValue(API.PARAM_KIN_WIN_SIZE)
+        
+    kineticsWindowSize = property(_getKineticsWindowSize)
+   
 #   Shutter
     def _getShutterState(self):
         return ShutterState(self.getParameterCurrentValue(API.PARAM_SHTR_OPEN_MODE)[1])
@@ -2507,11 +2486,7 @@ class Princeton(object):
         
     shutterOpenMode = property(_getShutterOpenMode,_setShutterOpenMode)
     
-    def _getKineticsWindowSize(self):
-        return self.getParameterCurrentValue(API.PARAM_KIN_WIN_SIZE)
-        
-    kineticsWindowSize = property(_getKineticsWindowSize)
-        
+     
             
 #==============================================================================
 #     Functions for our application
