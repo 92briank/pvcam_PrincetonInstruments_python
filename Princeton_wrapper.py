@@ -219,10 +219,10 @@ def API():
     PARAM_PRESCAN =             ((CLASS2<<16) + (TYPE_UNS16<<24)     +  55) # 24 for us //Laura 16/01/2015
     PARAM_POSTMASK =            ((CLASS2<<16) + (TYPE_UNS16<<24)     +  54) # 8 for us //Laura 16/01/2015
     PARAM_POSTSCAN =            ((CLASS2<<16) + (TYPE_UNS16<<24)     +  56) # 24 for us //Laura 16/01/2015
-    PARAM_PIX_PAR_DIST =        ((CLASS2<<16) + (TYPE_UNS16<<24)     + 500) # 13000 for us //Laura 16/01/2015
-    PARAM_PIX_PAR_SIZE =        ((CLASS2<<16) + (TYPE_UNS16<<24)     +  63) # 13000 for us //Laura 16/01/2015
-    PARAM_PIX_SER_DIST =        ((CLASS2<<16) + (TYPE_UNS16<<24)     + 501) # 13000 for us //Laura 16/01/2015
-    PARAM_PIX_SER_SIZE =        ((CLASS2<<16) + (TYPE_UNS16<<24)     +  62) # 13000 for us //Laura 16/01/2015
+    PARAM_PIX_PAR_DIST =        ((CLASS2<<16) + (TYPE_UNS16<<24)     + 500) # Distance center-to-center between pixels (parallel direction) in nanometer  13000 for us //Laura 16/01/2015
+    PARAM_PIX_PAR_SIZE =        ((CLASS2<<16) + (TYPE_UNS16<<24)     +  63) # Size of a single pixel's active area (parallel direction) in nanometer  13000 for us //Laura 16/01/2015
+    PARAM_PIX_SER_DIST =        ((CLASS2<<16) + (TYPE_UNS16<<24)     + 501) # Distance center-to-center between pixels (serial direction) in nanometer 13000 for us //Laura 16/01/2015
+    PARAM_PIX_SER_SIZE =        ((CLASS2<<16) + (TYPE_UNS16<<24)     +  62) # Size of a single pixel's active area (serial direction) in nanometer  13000 for us //Laura 16/01/2015
     PARAM_SUMMING_WELL =        ((CLASS2<<16) + (TYPE_BOOLEAN<<24)   + 505) # Not available for our camera //Laura 16/01/2015
     PARAM_FWELL_CAPACITY =      ((CLASS2<<16) + (TYPE_UNS32<<24)     + 506) # Not available for our camera //Laura 16/01/2015
     # Y dimension of active area of CCD chip */
@@ -1157,6 +1157,7 @@ class Princeton(object):
         self.addExposureROI(self._ROIfull)  # set ROI to full (2D)
 #       Set the exposure mode
         self._exposureMode = ExposureMode.timed
+        
         self._currentBuffer = int16(0) 
         self._circularBufferMode = CircularBufferMode.overwrite
         self.abortMode = CameraControlState.clearCloseShutter
@@ -2216,6 +2217,20 @@ class Princeton(object):
                 
     speed = property(_get_speed, _set_speed)      
                     
+#   pixel pitch
+    def _get_pixel_pitch(self):
+        """ Get the pixel pitch
+        
+        Returns
+        -------
+        pitchs : distance center-to-center between pixels (serial direction) in nanometer
+        pitchp : distance center-to-center between pixels (parallel direction) in nanometer
+       
+        """
+        return self.getParameterCurrentValue('PIX_SER_DIST'), self.getParameterCurrentValue('PIX_PAR_DIST')
+              
+    pitch = property(_get_pixel_pitch)      
+
 #   Exposure time
 
     def setExposureTime(self, exposureTime, exposureUnits):
