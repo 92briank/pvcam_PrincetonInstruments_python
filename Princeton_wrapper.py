@@ -47,11 +47,10 @@ Examples
 >>> plt.imshow(image[0][0][0])
 >>>
 >>> #set camera to 1D (vertical binning) acquisition
->>> s1, s2, sbin, p1, p2, pbin = camera.ROI[0]
 >>> camera.removeLastExposureROI()
->>> camera.addExposureROI((s1, s2, sbin, p1, p2, p2-p1+1))
+>>> camera.addExposureROI(camera._ROIspectroscopy)
 >>> spectrum = camera.takePicture()
->>> pl.plot(spectrum[0][0][0][0])
+>>> plt.plot(spectrum[0][0][0][0])
 >>>
 >>  #close communication
 >>> camera.close()
@@ -1150,10 +1149,12 @@ class Princeton(object):
         self.setParameterValue('EXP_TIME', self.expTime)
 #       Set the camera ROI
         Camerasizes, Camerasizep = self.getCameraSize()
-        bins = 1
-        binp = 1
-        self._ROIfull = API.rgn_type(0, Camerasizes-1, bins, 0, Camerasizep-1, binp)
-        self._ROI = [self._ROIfull]
+        bins = 1  # for ROIfull
+        binp = 1  # for ROIfull
+        self._ROIfull = (0, Camerasizes-1, bins, 0, Camerasizep-1, binp)  # full detector acquisition
+        self._ROIspectroscopy = (0, Camerasizes-1, bins, 0, Camerasizep-1, Camerasizep)  # spectroscopy mode ("vertical" binning)
+        self._ROI = []  # initialise empty ROI
+        self.addExposureROI(self._ROIfull)  # set ROI to full (2D)
 #       Set the exposure mode
         self._exposureMode = ExposureMode.timed
         self._currentBuffer = int16(0) 
