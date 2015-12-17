@@ -158,7 +158,23 @@ class ScriptLocation(Enum):
 class ExposureUnits(Enum):
     millisecond = 0
     microsecond = 1
-#    second = 2 # Not available for our camera
+    #second = 2 # Not available for our camera
+    
+class LogicOutput(Enum):
+    NOT_SCAN = 0
+    SHUTTER = 1
+    NOT_RDY = 2
+    LOGIC0 = 3
+    CLEARING = 4
+    NOT_FT_IMAGE_SHIFT = 5 
+    RESERVED = 6
+    LOGIC1 = 7
+    EXPOSE_PROG = 8 
+    EXPOSE = 9
+    IMAGE_SHIFT = 10
+    READOUT = 11
+    ACQUIRING = 12
+    WAIT_FOR_TRIG = 13
     
 class BufferPrec(Enum):
     int8precision = 0
