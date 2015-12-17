@@ -16,6 +16,9 @@ Uses Princeton class from https://github.com/ColinBrosseau/PythonPrincetonCamera
 from Princeton_wrapper import Princeton
 from master_Header_wrapper import *
 import matplotlib.pyplot as plt
+import numpy as np
+
+
 
 
 class Pixis(Princeton):
@@ -51,11 +54,19 @@ class Pixis(Princeton):
         self._ROI = []
         self.addExposureROI(self._ROIspectroscopy)
 
-    def measure(self, exposureTime=False):
+#   Typical measurement
+    def measure(self, exposureTime=False, removeBackgound=False):
         if exposureTime:
             self.exposureTime = exposureTime
-        spectrum = self.takePicture()
-        plt.plot(spectrum[0][0][0][0])
+        if removeBackgound:
+            self.shutter = 'closed'
+            background = np.squeeze(self.takePicture())
+            self.shutter = 'opened'
+            spectrum = np.squeeze(self.takePicture())
+            spectrum[0] = np.squeeze(spectrum[0] - background[0])
+        else:
+            spectrum = np.squeeze(self.takePicture())
+            spectrum[0] = np.squeeze(spectrum[0])
         return spectrum
        
     # Exposure time is in second. These functions replace the ones from super as there is no unit involved.
