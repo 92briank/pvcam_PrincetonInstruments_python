@@ -17,8 +17,21 @@ from Princeton_wrapper import Princeton
 from master_Header_wrapper import *
 import matplotlib.pyplot as plt
 
+
 class Pixis(Princeton):
     def __init__(self, number=0):
+        #   Mecanical Shutter
+        self._initShutter()  # initialise Logic Output to drive the shutter
+        # Delay (second) for setting of a mecanical shutter
+        self.delayShutter = 0.1  # second
+        # This enum is perticular to our setup. You migth have to reverse it.
+        # We connect the shutter to the Logic Output
+        self._PixisShutterMode = {'closed':ShutterOpenMode.never, 'opened':ShutterOpenMode.presequence}
+        # This is the reversed setup
+        #PixisShutterMode = {'closed':ShutterOpenMode.presequence, 'opened':ShutterOpenMode.never}
+        #reverse of the Shutter Mode (for reading)
+        self._reversePixisShutterMode = {v.name:k for k, v in PixisShutterMode.items()}
+
         super(Pixis, self).__init__()
         self.setpoint_temperature = -70  #set temperature (celcius)
         self.speed = 0  #set ADC speed index
@@ -76,6 +89,21 @@ class Pixis(Princeton):
        
     def close(self):
            self.closeCamera()
+           
+    def _initShutter(self):
+        self.logicOutput = LogicOutput.SHUTTER
+        
+    def _getShutter(self):
+        return reversePixisShutterMode[self.shutterOpenMode.name]
+
+    def _setShutter(self, value):
+        exposureTime = self.exposureTime  # Save exposure time
+        self.shutterOpenMode = PixisShutterMode[value]
+        # The shutter needs to have an exposure to apply.
+        self.measure(delayShutter)  # the delay also let time to shutter to set  
+        self.exposureTime = exposureTime  # Restore exposure time
+    
+    shutter = property(_getShutter, _setShutter)
 
 if __name__ == '__main__':
      camera = Pixis()
