@@ -94,13 +94,13 @@ class Pixis(Princeton):
         self.logicOutput = LogicOutput.SHUTTER
         
     def _getShutter(self):
-        return reversePixisShutterMode[self.shutterOpenMode.name]
+        return self._reversePixisShutterMode[self.shutterOpenMode.name]
 
     def _setShutter(self, value):
         exposureTime = self.exposureTime  # Save exposure time
-        self.shutterOpenMode = PixisShutterMode[value]
+        self.shutterOpenMode = self._PixisShutterMode[value]
         # The shutter needs to have an exposure to apply.
-        self.measure(delayShutter)  # the delay also let time to shutter to set  
+        self.measure(self.delayShutter)  # the delay also let time to shutter to set  
         self.exposureTime = exposureTime  # Restore exposure time
     
     shutter = property(_getShutter, _setShutter)
