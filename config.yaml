@@ -1,0 +1,15 @@
+# -*- coding: utf-8 -*-
+#"""
+#Created on Thu Sep 21 15:09:14 2017
+#
+#@author: Colin Brosseau
+#"""
+
+EEV400x1340B:
+    setpoint_temperature: -100  # celcius
+    speed: 0
+    gain: 1
+    exposureTime: 1  # second
+    shutter: 
+        reverse: False
+        delay: 0.1  # second
