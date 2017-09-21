@@ -1142,7 +1142,7 @@ class Princeton(object):
             raise PrincetonError(API.pl_error_code())
         self._handle = phandle.contents
 #       Set the temperature to 20°C just in case
-        self.setpoint_temperature = 20
+#        self.setpoint_temperature = 20
 #       Set the exposure time
         self.setExposureTime(1, ExposureUnits.microsecond)
         self.setParameterValue('EXP_TIME', self.expTime)
@@ -1322,7 +1322,7 @@ class Princeton(object):
         """
         paramCode = parameter
         if type(parameter) == str:
-            if not self.ParamSet.has_key(parameter):
+            if parameter not in self.ParamSet:
                 raise PrincetonError(2018)
             paramCode = self.ParamSet.get(parameter)
         description = ct.create_string_buffer(length)
@@ -1348,7 +1348,7 @@ class Princeton(object):
         """
         paramCode = parameter
         if type(parameter) == str:
-            if not self.ParamSet.has_key(parameter):
+            if parameter not in self.ParamSet:
                 raise PrincetonError(2018)
             paramCode = self.ParamSet.get(parameter)
         indexC = uns32(index)
@@ -1419,7 +1419,7 @@ class Princeton(object):
             modevalue = mode.value
         modevalue = int16(modevalue)
         if type(parameter) == type('bla'):
-            if not self.ParamSet.has_key(parameter):
+            if parameter not in self.ParamSet:
                 raise PrincetonError(2018)
             paramCode = self.ParamSet.get(parameter)
 #        Defines the type of the return value (depends on the mode of the attribute
@@ -1511,7 +1511,7 @@ class Princeton(object):
         """
         paramCode = parameter
         if type(parameter) == str:
-            if not self.ParamSet.has_key(parameter):
+            if not parameter in self.ParamSet:
                 raise PrincetonError(2018)
             paramCode = self.ParamSet.get(parameter)
             paramString = parameter
@@ -2237,9 +2237,9 @@ class Princeton(object):
         exposureUnits : units defined in the enumerated typ ExposureUnits
         """
         if exposureUnits.value == 0:
-            self.expTime = long(exposureTime)
+            self.expTime = int(exposureTime)
         elif exposureUnits.value == 1:
-            self.expTime = long(exposureTime)
+            self.expTime = int(exposureTime)
         self.setParameterValue(API.PARAM_EXP_RES_INDEX, exposureUnits.value)
         self.setParameterValue('EXP_TIME', self.expTime)
           
@@ -2616,7 +2616,6 @@ class Princeton(object):
             image = frame[0:(sizei * sizej)]
             return numpy.reshape(numpy.array(image), (sizei, sizej))
         
-
 
 class PrincetonError(Exception):
     """Exception to report Princeton problems."""
@@ -3304,4 +3303,5 @@ def PrincetonForceClose(number):
     handle = int16(number)
     if API.pl_cam_close(handle) == 0:
         raise PrincetonError(API.pl_error_code())
+        
         
