@@ -1141,6 +1141,10 @@ class Princeton(object):
         if API.pl_cam_open(camname, phandle, API.OPEN_EXCLUSIVE) == 0:
             raise PrincetonError(API.pl_error_code())
         self._handle = phandle.contents
+        
+        # List of valid parameters for this perticular camera
+        self._valid_parameters = self._EnumParam()
+        
 #       Set the temperature to 20°C just in case
 #        self.setpoint_temperature = 20
 #       Set the exposure time
@@ -2616,6 +2620,27 @@ class Princeton(object):
             image = frame[0:(sizei * sizej)]
             return numpy.reshape(numpy.array(image), (sizei, sizej))
         
+#==============================================================================
+#     Utility functions
+#============================================================================== 
+
+    def _EnumParam(self, verbose=False):
+        """
+        Valid parameters of the camera.
+        """
+        valid_parameters = []
+        for key, value in self.ParamSet.items():
+            try: 
+                a = self.getParameterCurrentValue(key)
+                valid_parameters.append(key)
+            except:
+                pass
+            else:
+                if verbose:
+                    print(key + '  ' + str(a))  
+        valid_parameters.sort() 
+        return valid_parameters
+
 
 class PrincetonError(Exception):
     """Exception to report Princeton problems."""
