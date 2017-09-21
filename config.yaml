@@ -5,7 +5,7 @@
 #@author: Colin Brosseau
 #"""
 
-EEV400x1340B:
+EEV400x1340B:  # Liqui nitrogen cooled detector
     setpoint_temperature: -100  # celcius
     speed: 0
     gain: 1

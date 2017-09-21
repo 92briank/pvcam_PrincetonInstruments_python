@@ -13,7 +13,7 @@ Uses Princeton class from https://github.com/ColinBrosseau/pvcam_PrincetonInstru
 :Version: 2017.09
 
 """
-from Princeton_wrapper import Princeton
+from Princeton_wrapper import Princeton, PrincetonError
 from master_Header_wrapper import *
 import matplotlib.pyplot as plt
 import numpy as np
@@ -28,33 +28,54 @@ class Easy_pvcam(Princeton):
         # import cameras configuration        
         with open("config.yaml", 'r') as ymlfile:
             camera_cfg = yaml.load(ymlfile)
-            
+
+        # Default temperature setpoint for safety if not present in configuration file  
+        try:       
+            self.setpoint_temperature = 20
+        except PrincetonError:
+            self.setpoint_temperature = -25
+        
         # Set camera parameters
         # Temperature (celcius)
-        self.setpoint_temperature = camera_cfg[chip_name]['setpoint_temperature']
+        try:
+            self.setpoint_temperature = camera_cfg[chip_name]['setpoint_temperature']
+        except KeyError:
+            pass
         # ADC speed index
-        self.speed = camera_cfg[chip_name]['speed']
+        try:
+            self.speed = camera_cfg[chip_name]['speed']
+        except KeyError:
+            pass
         # ADC gain
-        self.gain = camera_cfg[chip_name]['gain']  
+        try:
+            self.gain = camera_cfg[chip_name]['gain']  
+        except KeyError:
+            pass
         # Exposure time in second
-        self.exposureTime = camera_cfg[chip_name]['exposureTime']  
+        try:
+            self.exposureTime = camera_cfg[chip_name]['exposureTime']  
+        except KeyError:
+            pass
         
         #By default, camera is in full frame mode, set it to spectroscopy mode
         #set camera to 1D (vertical binning) acquisition
         self.setSpectroscopy()
 
         # Mecanical Shutter
-        if 'shutter' in cfg[chip_name]:
-            self._initShutter()  # initialise Logic Output to drive the shutter
-            # Delay (second) for setting of a mecanical shutter
-            self.delayShutter = cfg[chip_name]['shutter']['delay']
-            # This enum is perticular to our setup. You migth have to reverse it.
-            # We connect the shutter to the Logic Output
-            self._ShutterMode = {'closed':ShutterOpenMode.never, 'opened':ShutterOpenMode.presequence}
-            # This is the reversed setup
-            #PixisShutterMode = {'closed':ShutterOpenMode.presequence, 'opened':ShutterOpenMode.never}
-            #reverse of the Shutter Mode (for reading)
-            self._reverseShutterMode = {v.name:k for k, v in self._ShutterMode.items()}
+        try:
+            if 'shutter' in camera_cfg[chip_name]:
+                self._initShutter()  # initialise Logic Output to drive the shutter
+                # Delay (second) for setting of a mecanical shutter
+                self.delayShutter = camera_cfg[chip_name]['shutter']['delay']
+                # This enum is perticular to our setup. You migth have to reverse it.
+                # We connect the shutter to the Logic Output
+                self._ShutterMode = {'closed':ShutterOpenMode.never, 'opened':ShutterOpenMode.presequence}
+                # This is the reversed setup
+                #PixisShutterMode = {'closed':ShutterOpenMode.presequence, 'opened':ShutterOpenMode.never}
+                #reverse of the Shutter Mode (for reading)
+                self._reverseShutterMode = {v.name:k for k, v in self._ShutterMode.items()}
+        except KeyError:
+            pass
 
     def setImage(self):
         self._ROI = []
