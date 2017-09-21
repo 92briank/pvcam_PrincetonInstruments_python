@@ -1124,6 +1124,7 @@ class Princeton(object):
             Camera number. Must be in range 0 through PrincetonNumCameras()-1.
 
         """
+        # Initialise the camera
         res = API.pl_pvcam_init()
         if res == 0:
             errorcode = API.pl_error_code()
@@ -1145,11 +1146,10 @@ class Princeton(object):
         # List of valid parameters for this perticular camera
         self._valid_parameters = self._EnumParam()
         
-#       Set the temperature to 20°C just in case
-#        self.setpoint_temperature = 20
-#       Set the exposure time
+#       Set the default exposure time
         self.setExposureTime(1, ExposureUnits.microsecond)
         self.setParameterValue('EXP_TIME', self.expTime)
+
 #       Set the camera ROI
         Camerasizes, Camerasizep = self.getCameraSize()
         bins = 1  # for ROIfull
@@ -1158,6 +1158,7 @@ class Princeton(object):
         self._ROIspectroscopy = (0, Camerasizes-1, bins, 0, Camerasizep-1, Camerasizep)  # spectroscopy mode ("vertical" binning)
         self._ROI = []  # initialise empty ROI
         self.addExposureROI(self._ROIfull)  # set ROI to full (2D)
+
 #       Set the exposure mode
         self._exposureMode = ExposureMode.timed
         
