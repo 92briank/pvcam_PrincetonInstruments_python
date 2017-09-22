@@ -22,7 +22,7 @@ import yaml
 
 class Easy_pvcam(Princeton):
     def __init__(self, number=0):
-        super(Easy_pvcam, self).__init__()
+        super(Easy_pvcam, self).__init__(number = number)
         chip_name = self.getParameterCurrentValue('CHIP_NAME').decode('UTF-8').replace(' ','')
 
         # import cameras configuration        
@@ -169,10 +169,16 @@ class Easy_pvcam(Princeton):
         """
         Correct pixels from 'cosmic peaks' by comparing them with close neighborhood.
         """
-        import warnings
-        if self.__cosmic_peaks_spatial:
-            warnings.warn('TODO: Write cosmic peak spatial correction code')
-        return spectrum
+        if self.cosmic_peaks_spatial:
+            width = 2  # half width of neighborhood
+            spectrum_pad = np.pad(spectrum, width, mode='edge')
+            # Here width is hard coded i.e. [-2, -1, 1, 2]. Good idea to improve that. TODO
+            # Median of values around each pixel
+            median = np.median([np.roll(spectrum_pad, -2), np.roll(spectrum_pad, -1), np.roll(spectrum_pad, 1), np.roll(spectrum_pad, 2)], 0)[width:-width]
+            # Index of problematic pixels
+            I = np.abs((median-spectrum)/median) > self.__cosmic_peaks_spatial
+            # Replace bad pixels with their neighborhood median
+            spectrum[I] = median[I]     
         
 if __name__ == '__main__':
      camera = Easy_pvcam()
