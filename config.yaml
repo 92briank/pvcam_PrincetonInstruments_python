@@ -5,8 +5,14 @@
 #@author: Colin Brosseau
 #"""
 
-EEV400x1340B:  # Liqui nitrogen cooled detector
+EEV400x1340B:  # Liquid nitrogen cooled detector
     setpoint_temperature: -100  # celcius
+    speed: 0
+    gain: 1
+    exposureTime: 1  # second
+
+EEV256x1024BR:  # Pixis 256
+    setpoint_temperature: -70  # celcius
     speed: 0
     gain: 1
     exposureTime: 1  # second
