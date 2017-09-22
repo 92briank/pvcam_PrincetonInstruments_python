@@ -55,7 +55,7 @@ PV_FAIL = 0
 PV_OK = 1
 
 rs_bool = ctww.USHORT
-rs_bool_ptr = ctww.POINTER(rs_bool)
+rs_bool_ptr = ctw.POINTER(rs_bool)
 rs_bool_const_ptr = rs_bool_ptr
 char = ctw.c_char
 char_ptr = ctw.c_char_p
