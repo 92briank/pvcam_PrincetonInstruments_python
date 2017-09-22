@@ -77,6 +77,9 @@ class Easy_pvcam(Princeton):
         except KeyError:
             pass
 
+        # Signal corrections        
+        self.__cosmic_peaks_spatial = None  # None, [0-100] Correct pixel above some threshold from neighbor mean value
+
     def setImage(self):
         self._ROI = []
         self.addExposureROI(self._ROIfull)
@@ -147,6 +150,30 @@ class Easy_pvcam(Princeton):
     
     shutter = property(_getShutter, _setShutter)
 
+    #==============================================================================
+    #     Signal corrections 
+    #==============================================================================
+        
+    # Cosmic Peaks removal
+        
+    # Spatial correction
+    @property
+    def cosmic_peaks_spatial(self):
+        return self.__cosmic_peaks_spatial
+
+    @cosmic_peaks_spatial.setter
+    def cosmic_peaks_spatial(self, threshold):
+        self.__cosmic_peaks_spatial = threshold
+        
+    def _correct_cosmic_peaks_spatial(self, spectrum):
+        """
+        Correct pixels from 'cosmic peaks' by comparing them with close neighborhood.
+        """
+        import warnings
+        if self.__cosmic_peaks_spatial:
+            warnings.warn('TODO: Write cosmic peak spatial correction code')
+        return spectrum
+        
 if __name__ == '__main__':
      camera = Easy_pvcam()
      print("ROI:")
