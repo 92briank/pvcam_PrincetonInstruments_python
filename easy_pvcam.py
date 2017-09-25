@@ -93,7 +93,7 @@ class Easy_pvcam(Princeton):
 #   Typical measurement
     def measure(self, exposureTime=False, removeBackgound=False):
         if exposureTime:
-            self.exposureTime = exposureTime
+            self.exposureTime = exposureTime / self.numberPicturesToTake
 
         if removeBackgound:
             # Measure background
