@@ -18,6 +18,7 @@ from master_Header_wrapper import *
 import matplotlib.pyplot as plt
 import numpy as np
 import yaml
+import spikes
 
 
 class Easy_pvcam(Princeton):
@@ -79,6 +80,7 @@ class Easy_pvcam(Princeton):
 
         # Signal corrections        
         self.__cosmic_peaks_spatial = None  # None, [0-100] Correct pixel above some threshold from neighbor mean value
+        self.__cosmic_peaks_sequential = None
 
     def setImage(self):
         self._ROI = []
@@ -92,16 +94,36 @@ class Easy_pvcam(Princeton):
     def measure(self, exposureTime=False, removeBackgound=False):
         if exposureTime:
             self.exposureTime = exposureTime
+
         if removeBackgound:
+            # Measure background
             self.shutter = 'closed'
-            background = np.squeeze(self.takePicture())
+            background, metadata = self.takePicture()
+            background = np.squeeze(background)
+            # Measure signal + background
             self.shutter = 'opened'
-            spectrum = np.squeeze(self.takePicture())
-            spectrum[0] = np.squeeze(spectrum[0] - background[0])
-        else:
-            spectrum = np.squeeze(self.takePicture())
-            spectrum[0] = np.squeeze(spectrum[0])
-        return spectrum
+            spectrum, metadata = self.takePicture()
+            spectrum = np.squeeze(spectrum)
+            metadata = metadata[0][0]             
+            # Perform cosmic peak sequential correction
+            if self.__cosmic_peaks_sequential:
+                spectrum = spikes.cleanSpikes(spectrum)
+                background = spikes.cleanSpikes(background) 
+            # Calculate signal without background
+            spectrum = spectrum - background
+        else: 
+            # Measure signal + background
+            spectrum, metadata = self.takePicture()
+            spectrum = np.squeeze(spectrum)
+            metadata = metadata[0][0]             
+            # Perform cosmic peak sequential correction
+            if self.__cosmic_peaks_sequential:
+                spectrum = spikes.cleanSpikes(spectrum)
+        
+        # Correction cosmic_peaks_spatial
+        self._correct_cosmic_peaks_spatial(spectrum[0])
+        
+        return spectrum, metadata
        
     # Exposure time is in second. These functions replace the ones from super as there is no unit involved.
     def _getExposureTime(self):
@@ -180,6 +202,20 @@ class Easy_pvcam(Princeton):
             # Replace bad pixels with their neighborhood median
             spectrum[I] = median[I]     
         
+    # Sequential correction
+        
+    @property
+    def cosmic_peaks_sequential(self):
+        return self.__cosmic_peaks_sequential
+
+    @cosmic_peaks_sequential.setter
+    def cosmic_peaks_sequential(self, number):
+        if number:
+            self.__cosmic_peaks_sequential = True
+            self.numberPicturesToTake = number
+        else:
+            self.__cosmic_peaks_sequential = False    
+
 if __name__ == '__main__':
      camera = Easy_pvcam()
      print("ROI:")
