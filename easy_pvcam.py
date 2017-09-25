@@ -209,10 +209,12 @@ class Easy_pvcam(Princeton):
         return self.__cosmic_peaks_sequential
 
     @cosmic_peaks_sequential.setter
-    def cosmic_peaks_sequential(self, number):
-        if number:
+    def cosmic_peaks_sequential(self, value):
+        assert isinstance(value, bool)
+        if value:
             self.__cosmic_peaks_sequential = True
-            self.numberPicturesToTake = number
+            if self.numberPicturesToTake < 5:
+                self.numberPicturesToTake = 5
         else:
             self.__cosmic_peaks_sequential = False    
 
