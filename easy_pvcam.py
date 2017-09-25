@@ -63,6 +63,7 @@ class Easy_pvcam(Princeton):
         self.setSpectroscopy()
 
         # Mecanical Shutter
+        self._shutter_present = False
         try:
             if 'shutter' in camera_cfg[chip_name]:
                 self._initShutter()  # initialise Logic Output to drive the shutter
@@ -75,6 +76,7 @@ class Easy_pvcam(Princeton):
                 #PixisShutterMode = {'closed':ShutterOpenMode.presequence, 'opened':ShutterOpenMode.never}
                 #reverse of the Shutter Mode (for reading)
                 self._reverseShutterMode = {v.name:k for k, v in self._ShutterMode.items()}
+                self._shutter_present = True
         except KeyError:
             pass
 
@@ -95,7 +97,11 @@ class Easy_pvcam(Princeton):
         if exposureTime:
             self.exposureTime = exposureTime / self.numberPicturesToTake
 
-        if removeBackgound:
+        if removeBackgound and not self._shutter_present:
+            import warnings
+            warnings.warn('Cannot remove background because shutter not present or configured.')
+
+        if removeBackgound and self._shutter_present:
             # Measure background
             self.shutter = 'closed'
             background, metadata = self.takePicture()
