@@ -35,6 +35,10 @@ class Easy_pvcam(Princeton):
             self.setpoint_temperature = 20
         except PrincetonError:
             self.setpoint_temperature = -25
+        # Default Signal corrections        
+        self.__cosmic_peaks_spatial = None  # None, [0-100] Correct pixel above some threshold from neighbor mean value
+        self.__cosmic_peaks_sequential = None
+
         
         # Set camera parameters
         # Temperature (celcius)
@@ -69,21 +73,13 @@ class Easy_pvcam(Princeton):
                 self._initShutter()  # initialise Logic Output to drive the shutter
                 # Delay (second) for setting of a mecanical shutter
                 self.delayShutter = camera_cfg[chip_name]['shutter']['delay']
-                # This enum is perticular to our setup. You migth have to reverse it.
-                # We connect the shutter to the Logic Output
+                # Shutter configuration
                 self._ShutterMode = {'closed':ShutterOpenMode[camera_cfg[chip_name]['shutter']['closed']], 'opened':ShutterOpenMode[camera_cfg[chip_name]['shutter']['opened']]}
-                # This is the reversed setup
-                #PixisShutterMode = {'closed':ShutterOpenMode.presequence, 'opened':ShutterOpenMode.never}
-                #reverse of the Shutter Mode (for reading)
-                self._reverseShutterMode = {v.name:k for k, v in self._ShutterMode.items()}
+                self.shutter = 'closed'  # Needed to put the shutter in a valid state
                 self._shutter_present = True
         except KeyError:
             pass
-
-        # Signal corrections        
-        self.__cosmic_peaks_spatial = None  # None, [0-100] Correct pixel above some threshold from neighbor mean value
-        self.__cosmic_peaks_sequential = None
-
+        
     def setImage(self):
         self._ROI = []
         self.addExposureROI(self._ROIfull)
@@ -167,7 +163,8 @@ class Easy_pvcam(Princeton):
         self.logicOutput = LogicOutput.shutter
         
     def _getShutter(self):
-        return self._reverseShutterMode[self.shutterOpenMode.name]
+        reverseShutterMode = {v.name:k for k, v in self._ShutterMode.items()}
+        return reverseShutterMode[self.shutterOpenMode.name]
 
     def _setShutter(self, value):
         exposureTime = self.exposureTime  # Save exposure time
