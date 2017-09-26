@@ -30,6 +30,7 @@ class Easy_pvcam(Princeton):
         with open("config.yaml", 'r') as ymlfile:
             camera_cfg = yaml.load(ymlfile)
 
+        # DEFAULTS
         # Default temperature setpoint for safety if not present in configuration file  
         try:       
             self.setpoint_temperature = 20
@@ -89,9 +90,9 @@ class Easy_pvcam(Princeton):
         self.addExposureROI(self._ROIspectroscopy)
 
 #   Typical measurement
-    def measure(self, exposureTime=False, removeBackgound=False):
-        if exposureTime:
-            self.exposureTime = exposureTime / self.numberPicturesToTake
+    def measure(self, exposure=False, removeBackgound=False):
+        if exposure:
+            self.exposureTime = exposure / self.numberPicturesToTake
 
         if removeBackgound and not self._shutter_present:
             import warnings
@@ -126,17 +127,19 @@ class Easy_pvcam(Princeton):
         self._correct_cosmic_peaks_spatial(spectrum[0])
         
         return spectrum, metadata
-       
+              
     # Exposure time is in second. These functions replace the ones from super as there is no unit involved.
-    def _getExposureTime(self):
+    @property
+    def exposureTime(self):
         """Get the exposure time in units given by EXP_RES."""
         PropertyFastExposureResolutionConstant = {0:1e-3,
             1:1e-6}
         factor = PropertyFastExposureResolutionConstant.get(self.getParameterCurrentValue('EXP_RES_INDEX'))
         expTime = self.getParameterCurrentValue('EXP_TIME')
         return expTime * factor
-        
-    def _setExposureTime(self, exposureTime):
+    
+    @exposureTime.setter
+    def exposureTime(self, exposure):
         """Set the exposure time.
         
         Parameters
@@ -144,17 +147,15 @@ class Easy_pvcam(Princeton):
         exposureTime : exposure time in seconds 
                         unsigned int (0 - 65535)
         """
-        if exposureTime < 0.065535:  #short exposure, microsecond resolution
+        if exposure < 0.065535:  #short exposure, microsecond resolution
             exposureUnits = ExposureUnits.microsecond
-            self.expTime = int(exposureTime * 1e6)
+            self.expTime = int(exposure * 1e6)
         else:  #long exposure, millisecond resolution
             exposureUnits = ExposureUnits.millisecond
-            self.expTime = int(exposureTime * 1e3)
+            self.expTime = int(exposure * 1e3)
                         
         self.setParameterValue('EXP_RES_INDEX', exposureUnits.value)
         self.setParameterValue('EXP_TIME', self.expTime)
-
-    exposureTime = property(_getExposureTime, _setExposureTime)      
        
     def close(self):
            self.closeCamera()
@@ -162,18 +163,18 @@ class Easy_pvcam(Princeton):
     def _initShutter(self):
         self.logicOutput = LogicOutput.shutter
         
-    def _getShutter(self):
+    @property
+    def shutter(self):
         reverseShutterMode = {v.name:k for k, v in self._ShutterMode.items()}
         return reverseShutterMode[self.shutterOpenMode.name]
 
-    def _setShutter(self, value):
+    @shutter.setter
+    def shutter(self, value):
         exposureTime = self.exposureTime  # Save exposure time
         self.shutterOpenMode = self._ShutterMode[value]
         # The shutter needs to have an exposure to apply.
         self.measure(self.delayShutter)  # the delay also let time to shutter to set  
         self.exposureTime = exposureTime  # Restore exposure time
-    
-    shutter = property(_getShutter, _setShutter)
 
     #==============================================================================
     #     Signal corrections 
