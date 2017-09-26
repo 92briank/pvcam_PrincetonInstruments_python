@@ -128,7 +128,7 @@ class Easy_pvcam(Princeton):
         
         return spectrum, metadata
               
-    # Exposure time is in second. These functions replace the ones from super as there is no unit involved.
+    # Exposure time (second)
     @property
     def exposureTime(self):
         """Get the exposure time in units given by EXP_RES."""
@@ -160,6 +160,7 @@ class Easy_pvcam(Princeton):
     def close(self):
            self.closeCamera()
            
+    # Shutter
     def _initShutter(self):
         self.logicOutput = LogicOutput.shutter
         
