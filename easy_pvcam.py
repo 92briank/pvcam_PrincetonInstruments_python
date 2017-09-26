@@ -71,7 +71,7 @@ class Easy_pvcam(Princeton):
                 self.delayShutter = camera_cfg[chip_name]['shutter']['delay']
                 # This enum is perticular to our setup. You migth have to reverse it.
                 # We connect the shutter to the Logic Output
-                self._ShutterMode = {'closed':ShutterOpenMode.never, 'opened':ShutterOpenMode.presequence}
+                self._ShutterMode = {'closed':ShutterOpenMode[camera_cfg[chip_name]['shutter']['closed']], 'opened':ShutterOpenMode[camera_cfg[chip_name]['shutter']['opened']]}
                 # This is the reversed setup
                 #PixisShutterMode = {'closed':ShutterOpenMode.presequence, 'opened':ShutterOpenMode.never}
                 #reverse of the Shutter Mode (for reading)
@@ -164,7 +164,7 @@ class Easy_pvcam(Princeton):
            self.closeCamera()
            
     def _initShutter(self):
-        self.logicOutput = LogicOutput.SHUTTER
+        self.logicOutput = LogicOutput.shutter
         
     def _getShutter(self):
         return self._reverseShutterMode[self.shutterOpenMode.name]
