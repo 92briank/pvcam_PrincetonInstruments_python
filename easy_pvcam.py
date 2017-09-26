@@ -39,7 +39,9 @@ class Easy_pvcam(Princeton):
         # Default Signal corrections        
         self.__cosmic_peaks_spatial = None  # None, [0-100] Correct pixel above some threshold from neighbor mean value
         self.__cosmic_peaks_sequential = None
-
+        #By default, camera is in full frame mode, set it to spectroscopy mode
+        #set camera to 1D (vertical binning) acquisition
+        self.setSpectroscopy()
         
         # Set camera parameters
         # Temperature (celcius)
@@ -62,10 +64,6 @@ class Easy_pvcam(Princeton):
             self.exposureTime = camera_cfg[chip_name]['exposureTime']  
         except KeyError:
             pass
-        
-        #By default, camera is in full frame mode, set it to spectroscopy mode
-        #set camera to 1D (vertical binning) acquisition
-        self.setSpectroscopy()
 
         # Mecanical Shutter
         self._shutter_present = False
