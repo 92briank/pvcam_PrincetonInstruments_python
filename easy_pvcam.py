@@ -24,6 +24,16 @@ import spikes
 class Easy_pvcam(Princeton):
     def __init__(self, number=0):
         super(Easy_pvcam, self).__init__(number = number)
+        
+        # Reinitialise
+        # Without that, the second time one calls self.takePicture() it'll crash
+        self.takePicture()
+        try:
+            self.takePicture()
+        except OSError:
+            self.closeCamera()
+        super(Easy_pvcam, self).__init__(number = number)        
+        
         chip_name = self.getParameterCurrentValue('CHIP_NAME').decode('UTF-8').replace(' ','')
 
         # import cameras configuration        
