@@ -179,11 +179,13 @@ class Easy_pvcam(Princeton):
 
     @shutter.setter
     def shutter(self, value):
-        exposureTime = self.exposureTime  # Save exposure time
+        exposure_Time = self.exposureTime  # Save exposure time
         self.shutterOpenMode = self._ShutterMode[value]
         # The shutter needs to have an exposure to apply.
-        self.measure(self.delayShutter)  # the delay also let time to shutter to set  
-        self.exposureTime = exposureTime  # Restore exposure time
+        self.exposureTime = self.delayShutter  # delay to be sure the shutter is set 
+        self.takePicture()
+        # put back original exposure time
+        self.exposureTime = exposure_Time  # Restore exposure time
 
     #==============================================================================
     #     Signal corrections 
