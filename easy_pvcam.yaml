@@ -14,12 +14,13 @@ EEV400x1340B:  # Liquid nitrogen cooled detector
         opened: never
         closed: presequence
         delay: 0.1  # second
+        # We connect the shutter to the Not SCAN on back of ST133 controller
 
 EEV256x1024BR:  # Pixis 256
     setpoint_temperature: -70  # celcius
     speed: 0
     gain: 1
     exposureTime: 1  # second
-    shutter: 
-        reverse: False
-        delay: 0.1  # second
+#    shutter: 
+#        reverse: False
+#        delay: 0.1  # second

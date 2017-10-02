@@ -37,7 +37,7 @@ class Easy_pvcam(Princeton):
         chip_name = self.getParameterCurrentValue('CHIP_NAME').decode('UTF-8').replace(' ','')
 
         # import cameras configuration        
-        with open("config.yaml", 'r') as ymlfile:
+        with open("easy_pvcam.yaml", 'r') as ymlfile:
             camera_cfg = yaml.load(ymlfile)
 
         # DEFAULTS
